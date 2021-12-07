@@ -3,8 +3,14 @@
     <b-navbar toggleable type="light" variant="light">
         <b-navbar-brand to="/">Smart Parking</b-navbar-brand>
         <b-nav pills left>
-          <b-nav-item to="dashboard">
+          <b-nav-item to="/">
            Dashboard
+          </b-nav-item>
+          <b-nav-item to="users">
+           Users
+          </b-nav-item>
+          <b-nav-item to="logs">
+           Logs
           </b-nav-item>
         </b-nav>
     </b-navbar>
