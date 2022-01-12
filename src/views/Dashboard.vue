@@ -2,21 +2,12 @@
   <b-container class="mt-5">
     <div class="posts m10">
       <b-container class="bv-example-row">
-        <b-row>
+        <b-row class="mt-5">
           <b-col>
-            <b-card title="Parking Masuk">
-              <b-table striped hover :items="parkingIn" :fields="fieldsParkingIn">
+            <b-card title="Logs">
+              <b-table striped hover :items="logs" :fields="fields">
                 <template v-slot:cell(time_in)="data" >
-                  {{ data.item.time_in | getDate }}
-                </template>
-              </b-table>
-            </b-card>
-          </b-col>
-          <b-col>
-            <b-card title="Parking Keluar">
-              <b-table striped hover :items="parkingOut" :fields="fieldsParkingOut">
-              <template v-slot:cell(time_out)="data" >
-                  {{ data.item.time_out | getDate }}
+                  {{ data.item.time_in  }}
                 </template>
               </b-table>
             </b-card>
@@ -34,28 +25,16 @@ import id from 'date-fns/locale/id'
 export default {
   data () {
     return {
-      parkingIn: [],
-      parkingOut: [],
-      fieldsParkingOut: [
+      logs: [],
+      fields: [
         {
-          key: 'rfid'
+          key: 'inputname'
         },
         {
-          key: 'username'
+          key: 'inputvalue'
         },
         {
-          key: 'time_out'
-        }
-      ],
-      fieldsParkingIn: [
-        {
-          key: 'rfid'
-        },
-        {
-          key: 'username'
-        },
-        {
-          key: 'time_In'
+          key: 'time'
         }
       ]
     }
@@ -77,7 +56,6 @@ export default {
       const ini = this
       rmq.on('message', function (topic, message) {
         const data = message.toString().split('#')
-
         if (data[3] === 'gate-open') {
           ini.parkingIn.push({ rfid: data[0], username: data[1], time_in: data[2] })
         }
@@ -89,17 +67,10 @@ export default {
     },
     getLogs: async function () {
       try {
-        const response = await LogsService.getLogsLimit()
-        response.data.data.forEach(log => {
-          if (log.output_value === '0') {
-            this.parkingIn.push(log)
-          } else {
-            this.parkingOut.push(log)
-          }
-        })
+        const response = await LogsService.getLogs()
+        this.logs = response.data.data
       } catch (error) {
-        this.parkingIn = []
-        this.parkingOut = []
+        this.logs = []
       }
     }
   },
