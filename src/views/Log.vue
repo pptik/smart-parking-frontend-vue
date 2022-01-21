@@ -7,10 +7,10 @@
             <b-card title="Logs">
               <b-table striped hover :items="logs" :fields="fields">
                 <template v-slot:cell(time_in)="data" >
-                  {{ data.item.time_in | getDate }}
+                  {{ data.item.time_in }}
                 </template>
                 <template v-slot:cell(time_out)="data" >
-                  {{ data.item.time_out | getDate }}
+                  {{ data.item.time_out }}
                 </template>
               </b-table>
             </b-card>
@@ -31,16 +31,16 @@ export default {
       logs: [],
       fields: [
         {
-          key: 'rfid'
+          key: 'kode_rfid'
         },
         {
-          key: 'username'
+          key: 'nama'
         },
         {
-          key: 'time_in'
+          key: 'jam_masuk'
         },
         {
-          key: 'time_out'
+          key: 'jam_keluar'
         }
       ]
     }
@@ -75,6 +75,7 @@ export default {
       try {
         const response = await LogsService.getLogs()
         this.logs = response.data.data
+        console.log(this.logs)
       } catch (error) {
         this.logs = []
       }

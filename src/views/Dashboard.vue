@@ -7,7 +7,7 @@
             <b-card title="Parking Masuk">
               <b-table striped hover :items="parkingIn" :fields="fieldsParkingIn">
                 <template v-slot:cell(time_in)="data" >
-                  {{ data.item.time_in | getDate }}
+                  {{ data.item.time_in }}
                 </template>
               </b-table>
             </b-card>
@@ -16,7 +16,7 @@
             <b-card title="Parking Keluar">
               <b-table striped hover :items="parkingOut" :fields="fieldsParkingOut">
               <template v-slot:cell(time_out)="data" >
-                  {{ data.item.time_out | getDate }}
+                  {{ data.item.time_out }}
                 </template>
               </b-table>
             </b-card>
@@ -38,31 +38,33 @@ export default {
       parkingOut: [],
       fieldsParkingOut: [
         {
-          key: 'rfid'
+          key: 'kode_rfid'
         },
         {
-          key: 'username'
+          key: 'nama'
         },
         {
-          key: 'time_out'
+          key: 'jam_keluar'
         }
       ],
       fieldsParkingIn: [
         {
-          key: 'rfid'
+          key: 'kode_rfid'
         },
         {
-          key: 'username'
+          key: 'nama'
         },
         {
-          key: 'time_In'
+          key: 'jam_masuk'
         }
       ]
     }
   },
   beforeCreate: function () {
     rmq.on('connect', function () {
-      rmq.subscribe('gate-fallback')
+      rmq.subscribe('gate-fallback', function (err) {
+        console.log(err)
+      })
     })
   },
   filters: {
@@ -76,14 +78,14 @@ export default {
     filldata: function () {
       const ini = this
       rmq.on('message', function (topic, message) {
-        const data = message.toString().split('#')
-
+        const decoded = new TextDecoder('utf-8').decode(message)
+        const data = decoded.toString().split('#')
         if (data[3] === 'gate-open') {
-          ini.parkingIn.push({ rfid: data[0], username: data[1], time_in: data[2] })
+          ini.parkingIn.push({ kode_rfid: data[0], nama: data[1], jam_masuk: data[2] })
         }
 
         if (data[3] === 'gate-close') {
-          ini.parkingOut.push({ rfid: data[0], username: data[1], time_out: data[2] })
+          ini.parkingOut.push({ kode_rfid: data[0], nama: data[1], jam_keluar: data[2] })
         }
       })
     },
@@ -91,7 +93,7 @@ export default {
       try {
         const response = await LogsService.getLogsLimit()
         response.data.data.forEach(log => {
-          if (log.output_value === '0') {
+          if (log.jam_keluar !== null) {
             this.parkingIn.push(log)
           } else {
             this.parkingOut.push(log)
@@ -105,7 +107,7 @@ export default {
   },
   mounted () {
     this.filldata()
-    this.getLogs()
+    // this.getLogs()
   }
 }
 </script>
