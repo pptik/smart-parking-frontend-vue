@@ -4,6 +4,16 @@
       <b-container class="bv-example-row">
         <b-row>
           <b-col>
+            <b-form-input v-model="gateOpenGuid" placeholder="Enter GUID Open"></b-form-input>
+            <b-button @click="gateManualOpen()">Open Gate</b-button>
+          </b-col>
+          <b-col>
+            <b-form-input v-model="gateCloseGuid" placeholder="Enter GUID Close"></b-form-input>
+            <b-button @click="gateManualClose()">Close Gate</b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
             <b-card title="Parking Masuk">
               <b-table striped hover :items="parkingIn" :fields="fieldsParkingIn">
                 <template v-slot:cell(time_in)="data" >
@@ -34,6 +44,8 @@ import id from 'date-fns/locale/id'
 export default {
   data () {
     return {
+      gateOpenGuid: '',
+      gateCloseGuid: '',
       parkingIn: [],
       parkingOut: [],
       fieldsParkingOut: [
@@ -88,6 +100,26 @@ export default {
           ini.parkingOut.push({ kode_rfid: data[0], nama: data[1], jam_keluar: data[2] })
         }
       })
+    },
+    gateManualOpen: async function () {
+      try {
+        const data = {
+          guid: this.gateOpenGuid
+        }
+        await LogsService.openManualOpen(data)
+      } catch (error) {
+
+      }
+    },
+    gateManualClose: async function () {
+      try {
+        const data = {
+          guid: this.gateCloseGuid
+        }
+        await LogsService.openManualClose(data)
+      } catch (error) {
+
+      }
     },
     getLogs: async function () {
       try {
