@@ -12,6 +12,9 @@
           <b-nav-item to="logs">
            Logs
           </b-nav-item>
+          <b-nav-item to="register">
+           Register
+          </b-nav-item>
         </b-nav>
     </b-navbar>
     <router-view/>
